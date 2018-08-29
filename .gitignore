@@ -62,7 +62,7 @@ flycheck_*.el
 *.out
 
 ### Go Patch ###
-/vendor/
+vendor/
 /Godeps/
 
 
