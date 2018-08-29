@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/takeru911/ff14_quest_viewer/scraper"
+	"github.com/takeru911/ffxiv_quest_viewer/scraper"
 )
 
 func main() {
