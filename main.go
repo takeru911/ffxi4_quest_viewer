@@ -7,7 +7,10 @@ import (
 
 func main() {
 
-	questList, _ := scraper.ScrapeQuestList()
+	questList, err := scraper.ScrapeQuests()
+    if err != nil {
+        fmt.Println(err)
+    }
     for _, quest := range questList {
         fmt.Println(quest)
     }

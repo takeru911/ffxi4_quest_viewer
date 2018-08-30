@@ -5,13 +5,36 @@ import (
 	"time"
 )
 
-func ScrapeQuestList() ([]Quest, error) {
+func ScrapeQuests() ([]QuestDetail, error) {
+	questList, err := scrapeQuestList()
+	if err != nil {
+		return nil, err
+	}
+	questDetails := []QuestDetail{}
+	for _, quest := range questList {
+        fmt.Println(quest.Name)
+		err := quest.FetchQuestDetail()
+		if err != nil {
+			return nil, err
+		}
+		questDetail, err := quest.ParseQuestDetail()
+		if err != nil {
+			return nil, err
+		}
+		questDetails = append(questDetails, questDetail)
+		time.Sleep(3 * time.Second)
+	}
+
+	return questDetails, nil
+}
+
+func scrapeQuestList() ([]Quest, error) {
 
 	page := 1
 	hasNext := true
 	questList := []Quest{}
 	for hasNext {
-		tmp, hasNext, err := scrapeQuestList(page)
+		tmp, hasNext, err := scrapeQuestListPage(page)
 		if err != nil {
 			return nil, err
 		}
@@ -23,13 +46,16 @@ func ScrapeQuestList() ([]Quest, error) {
 		if hasNext {
 			page++
 		}
-		time.Sleep(2 * time.Second)
+		time.Sleep(3 * time.Second)
+		if page > 1 {
+			break
+		}
 	}
 
 	return questList, nil
 }
 
-func scrapeQuestList(page int) ([]Quest, bool, error) {
+func scrapeQuestListPage(page int) ([]Quest, bool, error) {
 	questPage := QuestPage{
 		fmt.Sprintf("https://jp.finalfantasyxiv.com/lodestone/playguide/db/quest/?page=%v", page),
 		nil,
