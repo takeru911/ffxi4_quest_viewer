@@ -15,6 +15,13 @@ type Quest struct {
 	Selection *goquery.Selection
 }
 
+//これはいずれ別のとこに行くはず
+//Itemのスクレイピングは現状行わないのでいったんここで
+type Item struct {
+	Url  string
+	Name string
+}
+
 type QuestDetail struct {
 	Url                   string
 	Name                  string
@@ -31,6 +38,7 @@ type QuestDetail struct {
 	Gil                   int
 	PremisQuests          []Quest
 	UnlockQuests          []Quest
+	SelectRewards         []Item
 }
 
 func (q *Quest) FetchQuestDetail() error {
@@ -95,6 +103,10 @@ func (q *Quest) ParseQuestDetail() (QuestDetail, error) {
 	if err != nil {
 		return QuestDetail{}, err
 	}
+	selectReward, err := parseSelectReward(questContent)
+	if err != nil {
+		return QuestDetail{}, err
+	}
 	return QuestDetail{
 		q.Url,
 		questName,
@@ -111,6 +123,7 @@ func (q *Quest) ParseQuestDetail() (QuestDetail, error) {
 		questReward["gil"],
 		premisQuests,
 		unlockQuests,
+		selectReward,
 	}, nil
 
 }
@@ -290,6 +303,30 @@ func parseUnlockQuests(s *goquery.Selection) ([]Quest, error) {
 	return unlockQuests, nil
 }
 
+func parseSelectReward(s *goquery.Selection) ([]Item, error) {
+	selectRewardParentTag := s.FilterFunction(func(index int, s *goquery.Selection) bool {
+		return s.Find("div.db-view__data > div.db-view__data__inner--select_reward > div.db-view__data__inner__wrapper > h4.db-view__data__title--quest_reward_list").Text() == "選択報酬"
+	})
+
+	if len(selectRewardParentTag.Nodes) == 0 {
+		return []Item{}, nil
+	}
+	selectRewardTag := selectRewardParentTag.Find("div.db-view__data > div.db-view__data__inner--select_reward > div.db-view__data__inner__wrapper > ul.db-view__data__item_list")
+	selectRewardItems := make([]Item, len(selectRewardTag.Nodes), len(selectRewardTag.Nodes))
+
+	selectRewardTag.Each(func(index int, s *goquery.Selection) {
+		aTag := s.Find("li > div.db-view__data__reward__item__name > div.db-view__data__reward__item__name__wrapper > a")
+		itemName := strings.TrimSpace(aTag.Text())
+		url, _ := aTag.Attr("href")
+		selectRewardItems[index] = Item{
+			url,
+			itemName,
+		}
+	})
+
+	return selectRewardItems, nil
+}
+
 func (q Quest) String() string {
 	return fmt.Sprintf(`
 {
@@ -302,9 +339,22 @@ func (q Quest) String() string {
 	)
 }
 
+func (i Item) String() string {
+	return fmt.Sprintf(`
+{
+	ItemUrl: %v,
+	ItemName: %v
+}
+`,
+		i.Url,
+		i.Name,
+	)
+}
+
 func (q QuestDetail) String() string {
 	return fmt.Sprintf(`
 {
+	QuestUrl : %v,
 	QuestName: %v,
 	QuestType: %v,
 	QuestClient: %v,
@@ -318,9 +368,11 @@ func (q QuestDetail) String() string {
 	Reward(Exp): %v,
 	Reward(Gil): %v,
 	PromisQuests: %v,
-	UnlockQuests: %v
+	UnlockQuests: %v,
+	SelectReward: %v
 }
 	`,
+		q.Url,
 		q.Name,
 		q.QuestType,
 		q.Client,
@@ -335,5 +387,6 @@ func (q QuestDetail) String() string {
 		q.Gil,
 		q.PremisQuests,
 		q.UnlockQuests,
+		q.SelectRewards,
 	)
 }

@@ -8,15 +8,23 @@ import (
 	"testing"
 )
 
-func TestParseQuestName(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
+func readHtml(fileName string) (*goquery.Selection, error) {
+	file, _ := ioutil.ReadFile(fileName)
 	stringReader := strings.NewReader(string(file))
 	doc, err := goquery.NewDocumentFromReader(stringReader)
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		return nil, err
 	}
 	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
+	return selection, nil
+}
+
+func TestParseQuestName(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest.html")
+	if err != nil {
+		t.Fatal("tailed test, cannot read test html file")
+	}
+
 	questName, err := parseQuestName(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -28,14 +36,10 @@ func TestParseQuestName(t *testing.T) {
 }
 
 func TestParseQuestType(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	questType, err := parseQuestType(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -47,14 +51,11 @@ func TestParseQuestType(t *testing.T) {
 }
 
 func TestParseQuestClient(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
+
 	questClient, err := parseQuestClient(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -66,14 +67,10 @@ func TestParseQuestClient(t *testing.T) {
 }
 
 func TestParseQuestPlace(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	questClient, err := parseQuestPlace(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -85,14 +82,10 @@ func TestParseQuestPlace(t *testing.T) {
 }
 
 func TestParseQuestXY(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	x, y, err := parseQuestXY(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -110,14 +103,11 @@ func TestParseQuestXY(t *testing.T) {
 }
 
 func TestParseQuestConditions(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	condition, err := parseQuestConditions(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -135,14 +125,10 @@ func TestParseQuestConditions(t *testing.T) {
 }
 
 func TestParseQuestReward(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	rewards, err := parseQuestReward(selection)
 	if err != nil {
 		t.Fatalf("failed test, %v", err)
@@ -158,14 +144,10 @@ func TestParseQuestReward(t *testing.T) {
 }
 
 func TestParsePremisQuests(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+	selection, err := readHtml("../resources/scraper/quest.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
 	premisQuests, _ := parsePremisQuests(selection)
 	expected := []Quest{
 		{
@@ -186,15 +168,25 @@ func TestParsePremisQuests(t *testing.T) {
 
 }
 
-func TestParseUnlockQuests(t *testing.T) {
-	testHtml := "../resources/scraper/quest.html"
-	file, _ := ioutil.ReadFile(testHtml)
-	stringReader := strings.NewReader(string(file))
-	doc, err := goquery.NewDocumentFromReader(stringReader)
+func TestParsePremisQuestsNothing(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest_simple.html")
 	if err != nil {
-		t.Fatal("tailed test, cannot read " + testHtml)
+		t.Fatal("tailed test, cannot read test html file")
 	}
-	selection := doc.Find("div#main > div#eorzea_db > div.clearfix > div.db_cnts > div.db__l_main")
+	premisQuests, _ := parsePremisQuests(selection)
+	expected := []Quest{}
+
+	if !reflect.DeepEqual(premisQuests, expected) {
+		t.Fatalf("failed test, incorrect result, actual = %v, expected = %v", premisQuests, expected)
+	}
+
+}
+
+func TestParseUnlockQuests(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest.html")
+	if err != nil {
+		t.Fatal("tailed test, cannot read test html file")
+	}
 	unlockQuests, _ := parseUnlockQuests(selection)
 	expected := []Quest{
 		{
@@ -218,4 +210,57 @@ func TestParseUnlockQuests(t *testing.T) {
 		t.Fatalf("failed test, incorrect result, actual = %v, expected = %v", unlockQuests, expected)
 	}
 
+}
+
+func TestParseUnlockQuestsNothing(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest_simple.html")
+	if err != nil {
+		t.Fatal("tailed test, cannot read test html file")
+	}
+	unlockQuests, _ := parseUnlockQuests(selection)
+	expected := []Quest{}
+
+	if !reflect.DeepEqual(unlockQuests, expected) {
+		t.Fatalf("failed test, incorrect result, actual = %v, expected = %v", unlockQuests, expected)
+	}
+
+}
+
+func TestSelectReward(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest.html")
+	if err != nil {
+		t.Fatal("tailed test, cannot read test html file")
+	}
+	selectReward, _ := parseSelectReward(selection)
+	expected := []Item{
+		{
+			"/lodestone/playguide/db/item/96029646ce8/",
+			"カリガ",
+		},
+		{
+			"/lodestone/playguide/db/item/76059262ca9/",
+			"ハードレザーサンダル",
+		},
+		{
+			"/lodestone/playguide/db/item/ce2e67f0442/",
+			"アラグ銅貨",
+		},
+	}
+
+	if !reflect.DeepEqual(selectReward, expected) {
+		t.Fatalf("failed test, incorrect result, actual = %v, expected = %v", selectReward, expected)
+	}
+}
+
+func TestSelectRewardNothing(t *testing.T) {
+	selection, err := readHtml("../resources/scraper/quest_simple.html")
+	if err != nil {
+		t.Fatal("tailed test, cannot read test html file")
+	}
+	selectReward, _ := parseSelectReward(selection)
+	expected := []Item{}
+
+	if !reflect.DeepEqual(selectReward, expected) {
+		t.Fatalf("failed test, incorrect result, actual = %v, expected = %v", selectReward, expected)
+	}
 }
