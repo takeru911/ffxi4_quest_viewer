@@ -38,7 +38,7 @@ type QuestDetail struct {
 	Gil                   int
 	PremisQuests          []Quest
 	UnlockQuests          []Quest
-	selectionRewards      []Item
+	SelectRewards         []Item
 }
 
 func (q *Quest) FetchQuestDetail() error {
@@ -339,6 +339,18 @@ func (q Quest) String() string {
 	)
 }
 
+func (i Item) String() string {
+	return fmt.Sprintf(`
+{
+	ItemUrl: %v,
+	ItemName: %v
+}
+`,
+		i.Url,
+		i.Name,
+	)
+}
+
 func (q QuestDetail) String() string {
 	return fmt.Sprintf(`
 {
@@ -356,7 +368,8 @@ func (q QuestDetail) String() string {
 	Reward(Exp): %v,
 	Reward(Gil): %v,
 	PromisQuests: %v,
-	UnlockQuests: %v
+	UnlockQuests: %v,
+	SelectReward: %v
 }
 	`,
 		q.Url,
@@ -374,5 +387,6 @@ func (q QuestDetail) String() string {
 		q.Gil,
 		q.PremisQuests,
 		q.UnlockQuests,
+		q.SelectReward,
 	)
 }
