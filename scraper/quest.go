@@ -387,6 +387,6 @@ func (q QuestDetail) String() string {
 		q.Gil,
 		q.PremisQuests,
 		q.UnlockQuests,
-		q.SelectReward,
+		q.SelectRewards,
 	)
 }
